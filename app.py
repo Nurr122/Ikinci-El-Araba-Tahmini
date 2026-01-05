@@ -5,7 +5,7 @@ import joblib
 import time
 
 # Sayfa Yapılandırması
-st.set_page_config(page_title="Pro Eksper v2", layout="wide", page_icon="🚗")
+st.set_page_config(page_title="Pro Eksper v2", layout="wide")
 
 # --- CSS: FULL DARK MODE (TAM KARANLIK MOD) ---
 st.markdown("""
@@ -100,15 +100,15 @@ def load_assets():
 
 model, scaler, model_columns, markalar, seriler, modeller, renkler, sehirler, kasalar, cekisler, kimdenler = load_assets()
 
-st.title("🚗 Araba Değerleme Eksper Raporu")
+st.title("Araba Değerleme Eksper Raporu")
 
 # --- SOL PANEL ---
 with st.sidebar:
-    st.header("📋 Araç Bilgileri")
+    st.header("Araç Bilgileri")
     marka_s = st.selectbox("Marka", markalar)
     seri_s = st.selectbox("Seri", seriler)
-    model_s = st.selectbox("Model Detayı", modeller)
-    yil = st.number_input("Model Yılı", 1990, 2026, 2018)
+    model_s = st.selectbox("Model", modeller)
+    yil = st.number_input("Yıl", 1990, 2026, 2018)
     km = st.number_input("Kilometre", 0, 1000000, 85000)
     sehir_s = st.selectbox("Şehir", sehirler)
     renk_s = st.selectbox("Renk", renkler)
@@ -116,7 +116,7 @@ with st.sidebar:
 # --- ANA EKRAN ---
 col_a, col_b = st.columns(2)
 with col_a:
-    st.subheader("⚙️ Teknik Özellikler")
+    st.subheader("Teknik Özellikler")
     vites = st.radio("Vites Tipi", ["Manuel", "Otomatik", "Yarı Otomatik"], horizontal=True)
     yakit = st.radio("Yakıt", ["Benzin", "Dizel", "Elektrik", "Hibrit", "LPG & Benzin"], horizontal=True)
     kasa = st.selectbox("Kasa Tipi", kasalar)
@@ -125,15 +125,15 @@ with col_a:
     motor_g = st.number_input("Motor Gücü (HP)", 50, 600, 110)
 
 with col_b:
-    st.subheader("🛠️ Kondisyon & Hasar")
+    st.subheader("Kondisyon & Hasar")
     tramer = st.number_input("Tramer Kaydı (TL)", 0, 1000000, 0)
     boya = st.slider("Boyalı Parça Sayısı", 0, 13, 0)
     degisen = st.slider("Değişen Parça Sayısı", 0, 13, 0)
-    kimden = st.selectbox("Satıcı Türü", kimdenler)
+    kimden = st.selectbox("Kimden", kimdenler)
     tuketim = st.number_input("Ort. Yakıt Tüketimi (lt/100km)", 1.0, 25.0, 5.5)
     depo = st.number_input("Yakıt Deposu (lt)", 10, 150, 50)
 
-if st.button("💰 ANALİZİ BAŞLAT"):
+if st.button("Fiyat Tahmin Et"):
     with st.spinner('Piyasa analizi yapılıyor...'):
         time.sleep(1)
         
