@@ -7,50 +7,78 @@ import time
 # Sayfa Yapılandırması
 st.set_page_config(page_title="Pro Eksper v2", layout="wide", page_icon="🚗")
 
-# --- CSS: RENKLERİ VE GÖRÜNÜRÜLÜĞÜ KESİN OLARAK SABİTLE ---
+# --- CSS: FULL DARK MODE (TAM KARANLIK MOD) ---
 st.markdown("""
     <style>
-    /* Ana Ekran Arka Planı */
-    .stApp { background-color: #f5f7f9 !important; }
+    /* 1. TÜM ARKA PLANLARI SİYAH YAP */
+    .stApp {
+        background-color: #0E1117 !important; /* Koyu antrasit/siyah */
+    }
+    
+    [data-testid="stSidebar"] {
+        background-color: #0E1117 !important; /* Sidebar da aynı renk */
+        border-right: 1px solid #262730; /* İnce bir ayırma çizgisi */
+    }
 
-    /* Rapor Kartı ve İçindeki Her Şey (Yazıları Siyaha Zorla) */
+    /* 2. TÜM YAZILARI BEYAZ YAP (ZORUNLU KIL) */
+    h1, h2, h3, h4, h5, h6, p, label, span, div {
+        color: #FFFFFF !important;
+        -webkit-text-fill-color: #FFFFFF !important;
+    }
+
+    /* 3. INPUT ALANLARI VE WIDGET'LAR */
+    /* Selectbox, Number Input vb. içindeki yazılar */
+    .stSelectbox div[data-baseweb="select"] div {
+        color: #FFFFFF !important;
+        -webkit-text-fill-color: #FFFFFF !important;
+    }
+    .stNumberInput input {
+        color: #FFFFFF !important;
+        -webkit-text-fill-color: #FFFFFF !important;
+    }
+    
+    /* Metrik Değerleri (Fiyatlar) */
+    [data-testid="stMetricValue"], [data-testid="stMetricLabel"] {
+        color: #FFFFFF !important;
+    }
+
+    /* 4. SAĞ ÜSTTEKİ DEPLOY VE MENU */
+    header[data-testid="stHeader"] {
+        background-color: transparent !important;
+    }
+    header[data-testid="stHeader"] * {
+        color: #FFFFFF !important; /* Üst menü yazıları beyaz */
+    }
+    header[data-testid="stHeader"] svg {
+        fill: #FFFFFF !important; /* Üç nokta ikonu beyaz */
+    }
+
+    /* 5. RAPOR KARTI (KOYU GRİ KUTU) */
     .report-card { 
-        background-color: #ffffff !important; 
-        padding: 25px; 
-        border-radius: 12px; 
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-        border: 1px solid #d1d5db;
-        margin-top: 25px;
-        color: #000000 !important; /* Tüm metinleri siyah yapar */
+        background-color: #262730 !important; /* Arka plandan biraz daha açık gri */
+        padding: 20px; 
+        border-radius: 10px; 
+        border: 1px solid #41444C;
+        color: #FFFFFF !important;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+    
+    /* Kartın içindeki HR çizgisi */
+    .report-card hr {
+        border-color: #555555 !important;
     }
 
-    /* Kartın içindeki başlık (📋 Detaylı Eksper Analizi) için özel siyah ayarı */
-    .report-card h4 { 
-        color: #000000 !important; 
-        font-weight: bold !important;
-        margin-bottom: 15px !important;
-    }
-
-    /* Kartın içindeki diğer metinler, listeler ve alt başlıklar */
-    .report-card b, .report-card p, .report-card div {
-        color: #000000 !important;
-    }
-
-    /* Ana ekrandaki Subheader (Teknik Özellikler vb.) için siyah ayarı */
-    h1, h2, h3, h4, h5, h6, label, p, span {
-        color: #1a1a1a !important;
-    }
-
-    /* Sol Panel (Sidebar) Beyaz Yazı / Siyah Arka Plan */
-    [data-testid="stSidebar"] { background-color: #111111 !important; }
-    [data-testid="stSidebar"] * { color: #ffffff !important; }
-
-    /* Buton Tasarımı */
+    /* 6. BUTON TASARIMI */
     .stButton>button { 
         background-color: #ff4b4b !important; 
         color: white !important; 
-        font-weight: bold;
-        border-radius: 8px;
+        font-weight: bold; 
+        border: none;
+        transition: all 0.3s;
+    }
+    .stButton>button:hover {
+        background-color: #ff2b2b !important;
+        box-shadow: 0 0 10px rgba(255, 75, 75, 0.5);
     }
     </style>
     """, unsafe_allow_html=True)
@@ -74,7 +102,7 @@ model, scaler, model_columns, markalar, seriler, modeller, renkler, sehirler, ka
 
 st.title("🚗 Araba Değerleme Eksper Raporu")
 
-# --- GİRİŞLER ---
+# --- SOL PANEL ---
 with st.sidebar:
     st.header("📋 Araç Bilgileri")
     marka_s = st.selectbox("Marka", markalar)
@@ -85,6 +113,7 @@ with st.sidebar:
     sehir_s = st.selectbox("Şehir", sehirler)
     renk_s = st.selectbox("Renk", renkler)
 
+# --- ANA EKRAN ---
 col_a, col_b = st.columns(2)
 with col_a:
     st.subheader("⚙️ Teknik Özellikler")
@@ -104,7 +133,6 @@ with col_b:
     tuketim = st.number_input("Ort. Yakıt Tüketimi (lt/100km)", 1.0, 25.0, 5.5)
     depo = st.number_input("Yakıt Deposu (lt)", 10, 150, 50)
 
-# --- ANALİZ ---
 if st.button("💰 ANALİZİ BAŞLAT"):
     with st.spinner('Piyasa analizi yapılıyor...'):
         time.sleep(1)
@@ -131,27 +159,14 @@ if st.button("💰 ANALİZİ BAŞLAT"):
         with mid: st.success(f"### Ortalama Değer\n ## {final_price:,.2f} TL")
         with high: st.metric("Maksimum Piyasa", f"{final_price*1.07:,.0f} TL")
 
-        # --- RAPOR KARTI ---
+        # Rapor Kartı da koyu renk olacak
         st.markdown(f"""
         <div class="report-card">
             <h4>📋 Detaylı Eksper Analizi</h4>
-            <p>Seçilen <b>{marka_s} {seri_s} ({yil})</b> aracınızın analizi tamamlanmıştır.</p>
-            <hr style="border: 0.5px solid #eee;">
-            <div style='display: flex; justify-content: space-between;'>
-                <div>
-                    <b>🛠️ Teknik Künye:</b><br>
-                    • Motor: {motor_h}cc / {motor_g}HP<br>
-                    • Tüketim: {tuketim} lt<br>
-                </div>
-                <div>
-                    <b>🚗 Kondisyon:</b><br>
-                    • Kilometre: {km:,.0f} km<br>
-                    • Tramer: {tramer:,.0f} TL
-                </div>
-            </div>
-            <hr style="border: 0.5px solid #eee;">
+            <p>Seçilen <b>{marka_s} {seri_s} ({yil})</b> aracınız için analiz tamamlandı.</p>
+            <hr>
             <p style="color: #ff4b4b !important; font-weight: bold;">
-                Uzman Görüşü: Bu araç için piyasa normu {final_price:,.0f} TL seviyesidir.
+                Uzman Görüşü: Aracın teknik donanımı ve kondisyonu göz önüne alındığında ortalama değer {final_price:,.0f} TL'dir.
             </p>
         </div>
         """, unsafe_allow_html=True)
