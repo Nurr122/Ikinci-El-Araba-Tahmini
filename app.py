@@ -55,7 +55,7 @@ st.title("Araba Değerleme Eksper Raporu")
 
 # --- SOL PANEL: SIRALI SEÇİM ---
 with st.sidebar:
-    st.header("🔍 Araç Seçimi")
+    st.header("Araç Seçimi")
     
     # 1. YIL
     yil = st.selectbox("Yıl", options=arac_agaci.keys())
