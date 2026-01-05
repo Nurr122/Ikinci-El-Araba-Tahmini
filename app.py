@@ -43,7 +43,7 @@ def load_assets():
     ck = joblib.load('cekis_listesi.pkl')
     km = joblib.load('kimden_listesi.pkl')
     
-    # YENİ 7 KATMANLI AĞAÇ
+    # YENİ 7 KATMANLI AĞAÇ (V2)
     agac = joblib.load('arac_agaci_v2.pkl')
     
     return model, scaler, model_cols, m, s, md, r, sh, ks, ck, km, agac
@@ -55,18 +55,18 @@ st.title("Araba Değerleme Eksper Raporu")
 
 # --- SOL PANEL: SIRALI SEÇİM ---
 with st.sidebar:
-    st.header("Araç Seçimi")
+    st.header("🔍 Araç Seçimi")
     
     # 1. YIL
     yil = st.selectbox("Yıl", options=arac_agaci.keys())
     
-    # 2. MARKA (Seçilen Yıla Göre)
+    # 2. MARKA
     marka_s = st.selectbox("Marka", options=arac_agaci[yil].keys())
     
-    # 3. SERİ (Seçilen Yıl ve Markaya Göre)
+    # 3. SERİ
     seri_s = st.selectbox("Seri", options=arac_agaci[yil][marka_s].keys())
     
-    # 4. MODEL (Seçilen Yıl, Marka ve Seriye Göre)
+    # 4. MODEL
     model_s = st.selectbox("Model", options=arac_agaci[yil][marka_s][seri_s].keys())
     
     # 5. KASA TİPİ
@@ -107,10 +107,10 @@ if st.button("FİYATI HESAPLA"):
     with st.spinner('Piyasa analizi yapılıyor...'):
         time.sleep(0.5)
         
-        input_df = pd.DataFrame(0, index=[0], columns=model_columns)
-        
-        # Seçimleri indekslere çevir
         try:
+            input_df = pd.DataFrame(0, index=[0], columns=model_columns)
+            
+            # Seçimleri indekslere çevir (Label Encoding Sütunları)
             input_df['marka'] = markalar_list.index(marka_s)
             input_df['seri'] = seriler_list.index(seri_s)
             input_df['model'] = modeller_list.index(model_s)
@@ -119,7 +119,7 @@ if st.button("FİYATI HESAPLA"):
             input_df['renk'] = renkler.index(renk_s)
             input_df['sehir'] = sehirler.index(sehir_s)
             
-            # Detaylar
+            # Sayısal Değerler
             input_df['tramer'] = tramer
             input_df['boyali_sayisi'] = boya
             input_df['degisen_sayisi'] = degisen
@@ -128,15 +128,34 @@ if st.button("FİYATI HESAPLA"):
             input_df['ortalama_yakit_tuketimi'] = tuketim
             input_df['yakit_deposu'] = depo
 
-            # One-Hot Encoding alanları
-            if vites_s != "Manuel": input_df[f'vites_tipi_{vites_s}'] = 1
-            if yakit_s != "Benzin": input_df[f'yakit_tipi_{yakit_s}'] = 1
+            # --- DÜZELTİLEN KISIM: AKILLI ONE-HOT ENCODING ---
+            # Modelin sütunlarına bakıyoruz. Eğer 'vites_tipi_Düz' diye bir sütun
+            # modelde YOKSA, kod hata vermez, sadece pas geçer (ki olması gereken budur).
             
+            # Vites Tipi
+            vites_col = f'vites_tipi_{vites_s}'
+            if vites_col in model_columns:
+                input_df[vites_col] = 1
+            
+            # Yakıt Tipi
+            yakit_col = f'yakit_tipi_{yakit_s}'
+            if yakit_col in model_columns:
+                input_df[yakit_col] = 1
+            
+            # Kasa Tipi
             kasa_col = f'kasa_tipi_{kasa_s}'
-            if kasa_col in model_columns: input_df[kasa_col] = 1
+            if kasa_col in model_columns:
+                input_df[kasa_col] = 1
                 
-            if f'cekis_{cekis}' in model_columns: input_df[f'cekis_{cekis}'] = 1
-            if f'kimden_{kimden}' in model_columns: input_df[f'kimden_{kimden}'] = 1
+            # Çekiş
+            cekis_col = f'cekis_{cekis}'
+            if cekis_col in model_columns:
+                input_df[cekis_col] = 1
+                
+            # Kimden
+            kimden_col = f'kimden_{kimden}'
+            if kimden_col in model_columns:
+                input_df[kimden_col] = 1
 
             # Tahmin
             input_scaled = scaler.transform(input_df)
@@ -147,7 +166,7 @@ if st.button("FİYATI HESAPLA"):
             # Detaylı Kart
             st.markdown(f"""
             <div class="report-card">
-                <h4> Araç Özeti</h4>
+                <h4>Araç Özeti</h4>
                 <p><b>{yil} {marka_s} {seri_s} {model_s}</b></p>
                 <p>{kasa_s} | {yakit_s} | {vites_s}</p>
                 <hr>
@@ -160,4 +179,4 @@ if st.button("FİYATI HESAPLA"):
             """, unsafe_allow_html=True)
             
         except Exception as e:
-            st.error(f"Hesaplama hatası: {e}")
+            st.error(f"Bir hata oluştu: {e}")
